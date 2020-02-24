@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>library-Vue</title>
+    <script src="js/vue.js"></script>
+    <style>
+        * {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .main{
+            position: relative;
+            top: 100px;
+            width: 600px;
+            margin: 0 auto;
+            background-color: WhiteSmoke;
+            box-shadow: 0 1px 3px 1px gray;
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 1px solid black;
+        }
+        th {
+            
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            width: 150px;
+            text-align: center;
+            background-color: skyblue;
+        }
+        table {
+            border-top: 1px solid black;
+            border-left: 1px solid black;
+        }
+        td {
+            text-align: center;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            
+        }
+        a {
+            text-decoration: none;
+            color: green;
+        }
+        .addBox {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .addBox button {
+            width: 50px;
+            
+        }
+        .numBox {
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-bottom: 1px solid black;
+        }
+        .bottom {
+            height: 8px;
+            background-color: skyblue;
+        }
+    </style>
+</head>
+<body>
+    <div id="vm" class="main">
+        <h1>图书管理系统</h1>
+        <div class="numBox">
+            <span>图书总数：</span>
+            <span>{{books.length}}</span>
+        </div>
+        <div class="addBox">
+            <label for="id">编号：</label>
+            <input type="text" id="id" v-model='id' :disabled='flag'>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <label for="name">名称：</label>
+            <input type="text" id="name" v-model='name'>
+            <button @click='handle'>提交</button>
+        </div>
+        <table border="0" cellspacing="0" cellpadding="0">
+            <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>名称</th>
+                    <th>时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr :key='item.id' v-for='item in books'>
+                    <td>{{item.id}}</td>
+                    <td>{{item.name}}</td>
+                    <td>{{item.date | format('yyyy-MM-dd hh:mm:ss')}}</td>
+                    <td>
+                        <a href="" @click.prevent='toEdit(item.id)'>修改</a>
+                        <span>|</span>
+                        <a href="" @click.prevent='toDelete(item.id)'>删除</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="bottom"></div>
+    </div>
+    <script>
+        Vue.filter('format',function(val,arg){
+            var time = new Date(parseInt(val));
+            var year = time.getFullYear()+'年';
+            var month = time.getMonth()+1+'月';
+            var date = time.getDate()+'日';
+            return [year,month,date].join('-');
+        });
+        var vm = new Vue({
+            el: '#vm',
+            data: {
+                id: '',
+                name: '',
+                flag: false,
+                books: [{
+                    id: '1',
+                    name: '三国演义',
+                    date: '1540535190627'
+                },{
+                    id: '2',
+                    name: '水浒传',
+                    date: '1555535190690'
+                },{
+                    id: '3',
+                    name: '红楼梦',
+                    date: '1552535190827'
+                },{
+                    id: '4',
+                    name: '西游记',
+                    date: '1581535191627'
+                },{
+                    id: '5',
+                    name: '斗罗大陆',
+                    date: '1580535191627'
+                }]
+            },
+            methods: {
+                handle: function(){
+                    if(this.books[this.id - 1]){
+                        var date = new Date().getTime();
+                        this.books[this.id - 1].name = this.name;
+                        this.books[this.id - 1].date = date;
+                    }else{
+                        if(this.id == '' || this.name == ''){
+                            return;
+                        }
+                        var book = {};
+                        var date = new Date().getTime();
+                        book.id = this.id;
+                        book.name = this.name;
+                        book.date = date;
+                        this.books.push(book);
+                    }
+                    this.id = '';
+                    this.name = '';
+                    this.flag = false;
+                },
+                toEdit: function(id){
+                    this.id = id;
+                    this.name = this.books[id - 1].name;
+                    this.flag = true;
+                },
+                toDelete: function(id){
+                    //方法2使用filter替换数组
+                    //查询数组中id相同的索引
+                    var index = this.books.findIndex((item)=>{
+                        return item.id == id;
+                    });
+                    this.books.splice(index,1);
+                }
+            }
+        });
+        
+    </script>
+</body>
+</html>
